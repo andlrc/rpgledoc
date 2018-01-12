@@ -88,10 +88,6 @@ function buildpage(outfp, docs)
 			${XY(doc.short_desc)}
 		</h2>
 		${Y(doc.long_desc)}
-		`);
-
-		if (doc.tag_params.length || doc.tag_return.desc) {
-			outfp.write(`
 		<table>
 			<thead>
 				<tr>
@@ -101,30 +97,34 @@ function buildpage(outfp, docs)
 				</tr>
 			</thead>
 			<tbody>
-			`);
-			if (doc.tag_return.desc) {
-				outfp.write(`
+				<tr>
+					<td><strong>Exported<strong></td>
+					<td></td>
+					<td>${doc.exported ? "Yes" : "No"}</td>
+				</tr>
+		`);
+		if (doc.tag_return.desc) {
+			outfp.write(`
 				<tr>
 					<td><strong>Return Value<strong></td>
 					<td>${X(doc.tag_return.type)}</td>
 					<td>${XY(doc.tag_return.desc)}</td>
 				</tr>
-				`);
-			}
-			doc.tag_params.forEach((param) => {
-				outfp.write(`
+			`);
+		}
+		doc.tag_params.forEach((param) => {
+			outfp.write(`
 				<tr>
 					<td><a href="#line:${X(param.line)}">${X(param.arg)}</a></td>
 					<td>${X(param.type)}</td>
 					<td>${XY(param.desc)}</td>
 				</tr>
-				`);
-			});
-			outfp.write(`
+			`);
+		});
+		outfp.write(`
 			</tbody>
 		</table>
-			`);
-		}
+		`);
 
 		if (doc.tag_see.length) {
 			outfp.write(`
