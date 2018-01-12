@@ -6,9 +6,9 @@ const path = require('path');
 /**
  * HTML Escape input
  */
-function X(str, Yify)
+function X(str)
 {
-	var map = {
+	const map = {
 		'&': '&amp;',
 		'<': '&lt;',
 		'>': '&gt;',
@@ -16,9 +16,7 @@ function X(str, Yify)
 		"'": '&#x27;',
 		'`': '&#x60;'
 	};
-	str = String(str).replace(/[&<>"'`]/g, (key) => map[key]);
-
-	return Yify ? Y(str) : str;
+	return String(str).replace(/[&<>"'`]/g, (key) => map[key]);
 }
 
 /**
@@ -28,8 +26,16 @@ function Y(str)
 {
 	/* {@link $REF} */
 	return str.replace(/{@link\s+(\S+)}/g, (_, ref) => {
-		return `<a href="#ref:${X(ref)}">${X(ref)}</a>`;
+		return `<a href="#ref:${X(ref)}">${XY(ref)}</a>`;
 	});
+}
+
+/**
+ * X then Y
+ */
+function XY(str)
+{
+	return Y(X(str));
 }
 
 function buildpage(outfp, docs)
@@ -75,11 +81,11 @@ function buildpage(outfp, docs)
 	docs.tags.forEach((doc, index) => {
 		outfp.write(`
 	<section><div class="container">
-		<h2 title="${X(doc.short_desc, false)}">
+		<h2 title="${X(doc.short_desc)}">
 			<a name="ref:${X(doc.refname)}" href="#ref:${X(doc.refname)}">${X(doc.refname)}</a>
 			<a href="#line:${X(doc.line)}" title="View Source">[S]</a>
 			-
-			${X(doc.short_desc)}
+			${XY(doc.short_desc)}
 		</h2>
 		${Y(doc.long_desc)}
 		`);
@@ -101,7 +107,7 @@ function buildpage(outfp, docs)
 				<tr>
 					<td><strong>Return Value<strong></td>
 					<td>${X(doc.tag_return.type)}</td>
-					<td>${X(doc.tag_return.desc)}</td>
+					<td>${XY(doc.tag_return.desc)}</td>
 				</tr>
 				`);
 			}
@@ -110,7 +116,7 @@ function buildpage(outfp, docs)
 				<tr>
 					<td><a href="#line:${X(param.line)}">${X(param.arg)}</a></td>
 					<td>${X(param.type)}</td>
-					<td>${X(param.desc)}</td>
+					<td>${XY(param.desc)}</td>
 				</tr>
 				`);
 			});
