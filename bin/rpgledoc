@@ -1,0 +1,50 @@
+#!/usr/bin/env node
+
+"use strict";
+const fs = require('fs');
+const path = require('path');
+const indexfile = require('../indexfile.js');
+const buildpage = require('../buildpage.js');
+
+const OUT_DIR = 'rpgledoc-html';
+
+try {
+	const stat = fs.statSync(OUT_DIR);
+	if (!stat.isDirectory()) {
+		console.error('%s: isn\'t a directory', OUT_DIR);
+		process.exit(1);
+	}
+} catch (e) {
+	if (e.code == 'ENOENT') {	/* Create output directory */
+		try {
+			fs.mkdirSync(OUT_DIR);
+		} catch (e) {
+			console.error('%s', e.message);
+			process.exit(1);
+		}
+	} else { 
+		console.error('%s', e.message);
+		process.exit(1);
+	}
+}
+
+process.argv.slice(2).forEach((infile) => {
+	let docs;
+
+	try {
+		docs = indexfile(infile);
+	} catch(e) {
+		console.error('%s: %s', infile, e.message);
+		return;		/* Process next file */
+	}
+	try {
+		const outfile = path.join(OUT_DIR, path.basename(infile) + '.html');
+		console.log('%s: %d tags', outfile, docs.tags.length);
+		const outfp = fs.createWriteStream(outfile);
+		buildpage(outfp, docs);
+		outfp.close();
+	} catch(e) {
+		console.error('%s: %s', infile, e.message);
+		return;		/* Process next file */
+	}
+});

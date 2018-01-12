@@ -1,0 +1,21 @@
+{
+  "name": "rpgledoc",
+  "version": "0.0.4",
+  "description": "",
+  "main": "indexfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andlrc/rpgledoc.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andlrc/rpgledoc/issues"
+  },
+  "bin": "bin/rpgledoc",
+  "homepage": "https://github.com/andlrc/rpgledoc#readme",
+  "dependencies": {}
+}
