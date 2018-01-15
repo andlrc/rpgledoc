@@ -3,6 +3,7 @@
 "use strict";
 const fs = require('fs');
 const path = require('path');
+const pgminfo = require('../package.json');
 const indexfile = require('../indexfile.js');
 const buildpage = require('../buildpage.js');
 
@@ -28,7 +29,16 @@ try {
 	}
 }
 
-process.argv.slice(2).forEach((infile) => {
+let dumpindex = 0;
+
+const argv = process.argv.slice(2);
+
+if (argv[0] == '-d') {
+	dumpindex++;
+	argv.shift();
+}
+
+argv.forEach((infile) => {
 	let docs;
 
 	try {
@@ -37,14 +47,18 @@ process.argv.slice(2).forEach((infile) => {
 		console.error('%s: %s', infile, e.message);
 		return;		/* Process next file */
 	}
-	try {
-		const outfile = path.join(OUT_DIR, path.basename(infile) + '.html');
-		console.log('%s: %d tags', outfile, docs.tags.length);
-		const outfp = fs.createWriteStream(outfile);
-		buildpage(outfp, docs);
-		outfp.close();
-	} catch(e) {
-		console.error('%s: %s', infile, e.message);
-		return;		/* Process next file */
+	if (dumpindex) {
+		console.log('%s', JSON.stringify(docs));
+	} else {
+		try {
+			const outfile = path.join(OUT_DIR, path.basename(infile) + '.html');
+			console.log('%s: %d tags', outfile, docs.tags.length);
+			const outfp = fs.createWriteStream(outfile);
+			buildpage(outfp, docs);
+			outfp.close();
+		} catch(e) {
+			console.error('%s: %s', infile, e.message);
+			return;		/* Process next file */
+		}
 	}
 });

@@ -13,7 +13,6 @@ function indexfile(infile, callback)
 
 	const docs = {
 		file: infile,
-		fileid: infile.replace(/\//g, '%'),
 		tags: [],
 		content: content
 	};
