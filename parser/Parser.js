@@ -86,12 +86,13 @@ Parser.prototype.parse = function()
 		}
 		if (state == DOC_OUT) {
 			if (!scope.pi) {
-				let m;
-				/* We need to capture something to please String.match, hence the
-				 * wierd capturing group below */
-				if ((m = line.match(/^\s*dcl-pi\s+\*n\s*((?:\s+\S*\s*)?;)/i))
-				    && !/\bend-pi\b/.test(line)) {
-					scope.pi = m[1].trim().slice(0, -1) || '-';
+				const r = /^\s*dcl-pi\s+\*n\b/;
+				if (r.test(line) && !/\bend-pi\b/.test(line)) {
+					let m;
+					if ((m = line.match(/^\s*dcl-pi\s+\*n\s+(\S+);/i)))
+						scope.pi = m[1];
+					else
+						scope.pi = '-';
 					if (doc && doc.refname == scope.proc)
 						doc.tag_return.type = scope.pi;
 				}
@@ -161,7 +162,7 @@ Parser.prototype.parse = function()
 
 			if (!scope.proc) {
 				let m;
-				if ((m = line.match(/^\s*dcl-proc\s+(\S+)/i)))
+				if ((m = line.match(/^\s*dcl-proc\s+(\S+(?=\s+export|\s*;))/i)))
 					scope.proc = m[1];
 			} else {
 				if (/^\s*end-proc\b/i.test(line))
