@@ -7,15 +7,32 @@ function isspace(c)
 	return (c == '\t' || c == ' ');
 }
 
-function indexfile(infile, callback)
+function Parser(infile)
 {
-	let content = fs.readFileSync(infile).toString();
+	this.file = infile;
+	this.tags = [];
+	this.lines = [];
 
-	const docs = {
-		file: infile,
-		tags: [],
-		content: content
+	this.readFile();
+	this.parse();
+}
+
+Parser.prototype.toJSON = function()
+{
+	return {
+		file: this.file,
+		tags: this.tags,
+		lines: this.lines
 	};
+}
+
+Parser.prototype.readFile = function()
+{
+	this.lines = fs.readFileSync(this.file).toString().split(/\r?\n/);
+}
+
+Parser.prototype.parse = function()
+{
 	let doc;
 
 	const scope = {
@@ -36,7 +53,7 @@ function indexfile(infile, callback)
 
 	let state = DOC_OUT;
 
-	content.split(/\r?\n/).forEach((line, lineno) => {
+	this.lines.forEach((line, lineno) => {
 		lineno++;
 		if (line.length == 0)
 			return;		/* Skip empty lines */
@@ -73,7 +90,7 @@ function indexfile(infile, callback)
 				} else if (doc && doc.refname == scope.proc) {
 					/* Update current doc with proper types for the params */
 					let m;
-					if ((m = line.match(/^\s*(\w+)\s+(\S+(?=;|\s))/))) {
+					if ((m = line.match(/^\s*(\w+)\s+(.*?);/))) {
 						doc.tag_params.some((param) => {
 							if (param.arg == m[1]) {
 								param.type = m[2];
@@ -96,7 +113,7 @@ function indexfile(infile, callback)
 				} else if (doc && doc.refname == scope.ds) {
 					/* Update current doc with proper types for the params */
 					let m;
-					if ((m = line.match(/^\s*(\w+)\s+(\S+(?=;|\s))/))) {
+					if ((m = line.match(/^\s*(\w+)\s+(.*?);/))) {
 						doc.tag_params.some((param) => {
 							if (param.arg == m[1]) {
 								param.type = m[2];
@@ -135,7 +152,7 @@ function indexfile(infile, callback)
 						desc: ''
 					}
 				};
-				docs.tags.push(doc);
+				this.tags.push(doc);
 			}
 			return;		/* Next line */
 		}
@@ -146,7 +163,7 @@ function indexfile(infile, callback)
 		}
 
 		/* Remove comment leader */
-		line = line.replace(/^\s*\*\s*/gm, '');
+		line = line.replace(/^\s*\*\s*/g, '');
 
 		if (line[0] == '@') {
 			if (line.startsWith('@see') && isspace(line[4])) {
@@ -214,8 +231,6 @@ function indexfile(infile, callback)
 			break;
 		}
 	});
-
-	return docs;
 }
 
-module.exports = indexfile;
+module.exports = Parser;
