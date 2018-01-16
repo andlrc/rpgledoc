@@ -20,6 +20,7 @@ const indicies = [];
 argv.forEach((infile) => {
 	try {
 		const parser = new Parser(infile);
+		console.log('%s: %d tags found', infile, parser.tags.length);
 		indicies.push(parser);
 	} catch(e) {
 		if (debug)
