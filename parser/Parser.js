@@ -4,7 +4,12 @@ const fs = require('fs');
 
 function isspace(c)
 {
-	return (c == '\t' || c == ' ');
+	return (c === '\t' || c === ' ');
+}
+
+function isblank(c)
+{
+	return isspace(c) || c === void 0;
 }
 
 function Parser(infile)
@@ -169,16 +174,16 @@ Parser.prototype.parse = function()
 		line = line.replace(/^\s*\*\s*/g, '');
 
 		if (line[0] == '@') {
-			if (line.startsWith('@see') && isspace(line[4])) {
+			if (line.startsWith('@see') && isblank(line[4])) {
 				state = DOC_SEE;
 				line = line.slice(4);
-			} else if (line.startsWith('@param') && isspace(line[6])) {
+			} else if (line.startsWith('@param') && isblank(line[6])) {
 				state = DOC_PARAM;
 				line = line.slice(6);
-			} else if (line.startsWith('@return') && isspace(line[7])) {
+			} else if (line.startsWith('@return') && isblank(line[7])) {
 				state = DOC_RETURN;
 				line = line.slice(7);
-			} else if (line.startsWith('@example') && isspace(line[8])) {
+			} else if (line.startsWith('@example') && isblank(line[8])) {
 				state = DOC_EXAMPLE;
 				line = line.slice(8);
 			} else {

@@ -67,7 +67,7 @@ Builder.prototype.renderIndex = function(outfp, index)
 	index.tags.forEach(tag => {
 		outfp.write(`<section id="ref:${tag.refname}" data-exported="${tag.exported}">`);
 		outfp.write(`<header>`);
-		outfp.write(`<h3><a href="${fileName}.html#l${tag.line}">`);
+		outfp.write(`<h3><a href="${fileName}.html#line:${tag.line}">`);
 		outfp.write(tag.refname);
 		if (tag.type == "proc") {
 			outfp.write(`(`);
@@ -95,7 +95,7 @@ Builder.prototype.renderIndex = function(outfp, index)
 			}
 			tag.tag_params.forEach(param => {
 				outfp.write(`<tr>`);
-				outfp.write(`<td><a href="${fileName}.html#l${param.line}">${param.arg}</a></td>`);
+				outfp.write(`<td><a href="${fileName}.html#line:${param.line}">${param.arg}</a></td>`);
 				outfp.write(`<td>${param.type.replace(/ /g, '&nbsp')}</td>`);
 				outfp.write(`<td>${util.interpretMarkers(util.escapeHtml(param.desc))}</td>`);
 				outfp.write(`</tr>`);
@@ -107,7 +107,7 @@ Builder.prototype.renderIndex = function(outfp, index)
 		if (tag.tag_example.length) {
 			outfp.write(`<details open><summary>Examples</summary>`);
 			tag.tag_example.forEach((example, ix) => {
-				const title = example.title ? example.title : `Example ${ix + 1}`;
+				const title = example.title ? util.interpretMarkers(example.title) : `Example #${ix + 1}`;
 				outfp.write(`<h5>${title}</h5>`);
 				outfp.write(`<pre><code>`);
 				example.lines.forEach(line => {
@@ -151,12 +151,12 @@ Builder.prototype.renderSourceView = function(outfp, index)
 	outfp.write('<pre><code><ol>');
 	index.lines.forEach((line, lineno) => {
 		lineno++;
-		outfp.write(`<li id="l${lineno}">`);
+		outfp.write(`<li id="line:${lineno}">`);
 		if (line === '')
 			line = '&nbsp;'
 		else
 			line = util.escapeHtml(line);
-		outfp.write(`<a href="#l${lineno}">${line}</a>`);
+		outfp.write(`<a href="#line:${lineno}">${line}</a>`);
 		outfp.write(`</li>`);
 	});
 	outfp.write('</ol></code></pre>');
