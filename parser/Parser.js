@@ -40,16 +40,18 @@ Parser.prototype.parse = function()
 		ds: '',
 		pi: ''
 	};
-
-	const DOC_OUT    = 0;	/* Searching for documentation */
-	const DOC_NAME   = 1;	/* Searching for a reference name */
-	const DOC_SDESC  = 2;	/* Short description (First line of documentation) */
-	const DOC_LDESC  = 3;	/* Long description (Continues lines of documentation) */
-	const DOC_SEE    = 4;	/* @see    $REF */
-	const DOC_SEEC   = 5;	/* @see    $REF */
-	const DOC_PARAM  = 6;	/* @param  $ARG $DESC */
-	const DOC_PARAMC = 7;	/* @param  $ARG $DESC */
-	const DOC_RETURN = 8;	/* @return $DESC */
+ 
+	const DOC_OUT      = 0;		/* Searching for documentation */
+	const DOC_NAME     = 1;		/* Searching for a reference name */
+	const DOC_SDESC    = 2;		/* Short description (First line of documentation) */
+	const DOC_LDESC    = 3;		/* Long description (Continues lines of documentation) */
+	const DOC_SEE      = 4;		/* @see    $REF */
+	const DOC_SEEC     = 5;		/* @see    $REF */
+	const DOC_PARAM    = 6;		/* @param  $ARG $DESC */
+	const DOC_PARAMC   = 7;		/* @param  $ARG $DESC */
+	const DOC_RETURN   = 8;		/* @return $DESC */
+	const DOC_EXAMPLE  = 9;		/* @example $TITLE */
+	const DOC_EXAMPLEC = 10;	/* $CODE */
 
 	let state = DOC_OUT;
 
@@ -150,7 +152,8 @@ Parser.prototype.parse = function()
 					tag_return: {		/* @return $DESC */
 						type: '-',
 						desc: ''
-					}
+					},
+					tag_example: [],	/* @example $TITLE NL $CODE */
 				};
 				this.tags.push(doc);
 			}
@@ -175,6 +178,9 @@ Parser.prototype.parse = function()
 			} else if (line.startsWith('@return') && isspace(line[7])) {
 				state = DOC_RETURN;
 				line = line.slice(7);
+			} else if (line.startsWith('@example') && isspace(line[8])) {
+				state = DOC_EXAMPLE;
+				line = line.slice(8);
 			} else {
 				throw new Error(line.split(/\s+/).shift() + ': unknown tag');
 			}
@@ -228,6 +234,16 @@ Parser.prototype.parse = function()
 				doc.tag_return.desc = line;
 			else
 				doc.tag_return.desc += ' ' + line;
+			break;
+		case DOC_EXAMPLE:
+			doc.tag_example.push({
+				title: line,
+				lines: []
+			});
+			state = DOC_EXAMPLEC;
+			break;
+		case DOC_EXAMPLEC:
+			doc.tag_example[doc.tag_example.length - 1].lines.push(line);
 			break;
 		}
 	});

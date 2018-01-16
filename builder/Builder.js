@@ -50,9 +50,10 @@ Builder.prototype.renderIndicies = function()
 	this.writeHead(outfp, 'Index');
 	outfp.write('<style>');
 	outfp.write('body{max-width:750px;margin:0 auto;}');
-	outfp.write('section{margin-bottom:100px;}');
+	outfp.write('section{margin-bottom:60px;}');
 	outfp.write('table{width:100%;}');
 	outfp.write('td{background-color:#eeeeee;padding:5px;vertical-align:top;}');
+	outfp.write('details{margin-bottom: 15px;}');
 	outfp.write('</style>');
 	this.indicies.forEach(index => {
 		this.renderIndex(outfp, index);
@@ -81,33 +82,50 @@ Builder.prototype.renderIndex = function(outfp, index)
 		outfp.write(`<summary><p>${util.interpretMarkers(util.escapeHtml(tag.short_desc))}</summary>`);
 		outfp.write(`</header>`);
 		outfp.write(`${util.interpretMarkers(tag.long_desc)}`);
+
+		outfp.write(`<details open><summary>Interface</summary>`);
 		if (tag.tag_params.length || tag.tag_return.desc) {
 			outfp.write(`<table>`);
 			if (tag.tag_return.desc) {
 				outfp.write(`<tr>`);
 				outfp.write(`<td>returns</td>`);
 				outfp.write(`<td>${tag.tag_return.type.replace(/ /g, '&nbsp;')}</td>`);
-				outfp.write(`<td width="100%">${tag.tag_return.desc}</td>`);
+				outfp.write(`<td width="100%">${util.interpretMarkers(util.escapeHtml(tag.tag_return.desc))}</td>`);
 				outfp.write(`</tr>`);
 			}
 			tag.tag_params.forEach(param => {
 				outfp.write(`<tr>`);
 				outfp.write(`<td><a href="${fileName}.html#l${param.line}">${param.arg}</a></td>`);
 				outfp.write(`<td>${param.type.replace(/ /g, '&nbsp')}</td>`);
-				outfp.write(`<td>${param.desc}</td>`);
+				outfp.write(`<td>${util.interpretMarkers(util.escapeHtml(param.desc))}</td>`);
 				outfp.write(`</tr>`);
 			});
 			outfp.write(`</table>`);
 		}
+		outfp.write(`</details>`);
+
+		if (tag.tag_example.length) {
+			outfp.write(`<details open><summary>Examples</summary>`);
+			tag.tag_example.forEach((example, ix) => {
+				const title = example.title ? example.title : `Example ${ix + 1}`;
+				outfp.write(`<h5>${title}</h5>`);
+				outfp.write(`<pre><code>`);
+				example.lines.forEach(line => {
+					outfp.write(`${line}\n`);
+				});
+				outfp.write(`</code></pre>`);
+			});
+			outfp.write(`</details>`);
+		}
 
 		if (tag.tag_see.length) {
-			outfp.write(`<h4>See also</h4>`);
-			outfp.write(`<ul>`);
+			outfp.write(`<details open><summary>See Also</summary><ul>`);
 			tag.tag_see.forEach(see => {
 				outfp.write(`<li>${util.interpretMarkers('{@link ' + see + '}')}`);
 			});
-			outfp.write(`</ul>`);
+			outfp.write(`</ul></details>`);
 		}
+
 		outfp.write(`</section>`);
 	});
 }
