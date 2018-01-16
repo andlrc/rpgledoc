@@ -60,10 +60,12 @@ Parser.prototype.parse = function()
 
 	let state = DOC_OUT;
 
-	this.lines.forEach((line, lineno) => {
+	this.lines.forEach((orig_line, lineno) => {
 		lineno++;
-		if (line.length == 0)
+		if (orig_line.length == 0)
 			return;		/* Skip empty lines */
+
+		let line = orig_line;
 
 		if (state == DOC_NAME) {
 			let m;
@@ -171,7 +173,11 @@ Parser.prototype.parse = function()
 		}
 
 		/* Remove comment leader */
-		line = line.replace(/^\s*\*\s*/g, '');
+		line = line.replace(/^\s*\*/g, '');
+
+		/* Keep a line with original indent as it's used for examples */
+		const indented_line = line;
+		line = indented_line.trim();
 
 		if (line[0] == '@') {
 			if (line.startsWith('@see') && isblank(line[4])) {
@@ -248,7 +254,8 @@ Parser.prototype.parse = function()
 			state = DOC_EXAMPLEC;
 			break;
 		case DOC_EXAMPLEC:
-			doc.tag_example[doc.tag_example.length - 1].lines.push(line);
+			const ex_lines = doc.tag_example[doc.tag_example.length - 1].lines;
+			ex_lines.push(indented_line);
 			break;
 		}
 	});
