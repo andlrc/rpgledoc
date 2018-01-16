@@ -65,7 +65,7 @@ Builder.prototype.renderIndex = function(outfp, index)
 {
 	const fileName = path.basename(index.file);
 	index.tags.forEach(tag => {
-		outfp.write(`<section id="ref:${tag.refname}" data-exported="${tag.exported}">`);
+		outfp.write(`<section id="ref:${tag.refname}">`);
 		outfp.write(`<header>`);
 		outfp.write(`<h3><a href="${fileName}.html#line:${tag.line}">`);
 		outfp.write(tag.refname);
@@ -83,8 +83,23 @@ Builder.prototype.renderIndex = function(outfp, index)
 		outfp.write(`</header>`);
 		outfp.write(`${util.interpretMarkers(tag.long_desc)}`);
 
-		outfp.write(`<details open><summary>Interface</summary>`);
+		outfp.write(`<details open><summary>Details</summary>`);
+		outfp.write(`<table>`);
+		outfp.write(`<tr>`);
+		outfp.write(`<td>Exported</td>`);
+		outfp.write(`<td width="100%">${tag.exported ? "Yes" : "No"}</td>`);
+		outfp.write(`</tr>`);
+		outfp.write(`<tr>`);
+		if (tag.tag_deprecated.deprecated) {
+			outfp.write(`<td>Deprecated</td>`);
+			outfp.write(`<td>${tag.tag_deprecated.desc || "Yes"}</td>`);
+		}
+		outfp.write(`</tr>`);
+		outfp.write(`</table>`);
+		outfp.write(`</details>`);
+
 		if (tag.tag_params.length || tag.tag_return.desc) {
+			outfp.write(`<details open><summary>${tag.type === "ds" ? "Fields" : "Interface"}</summary>`);
 			outfp.write(`<table>`);
 			if (tag.tag_return.desc) {
 				outfp.write(`<tr>`);

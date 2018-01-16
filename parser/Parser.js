@@ -43,20 +43,22 @@ Parser.prototype.parse = function()
 	const scope = {
 		proc: '',
 		ds: '',
-		pi: ''
+		pi: '',
+		pr: ''
 	};
  
-	const DOC_OUT      = 0;		/* Searching for documentation */
-	const DOC_NAME     = 1;		/* Searching for a reference name */
-	const DOC_SDESC    = 2;		/* Short description (First line of documentation) */
-	const DOC_LDESC    = 3;		/* Long description (Continues lines of documentation) */
-	const DOC_SEE      = 4;		/* @see    $REF */
-	const DOC_SEEC     = 5;		/* @see    $REF */
-	const DOC_PARAM    = 6;		/* @param  $ARG $DESC */
-	const DOC_PARAMC   = 7;		/* @param  $ARG $DESC */
-	const DOC_RETURN   = 8;		/* @return $DESC */
-	const DOC_EXAMPLE  = 9;		/* @example $TITLE */
-	const DOC_EXAMPLEC = 10;	/* $CODE */
+	const DOC_OUT        = 0;	/* Searching for documentation */
+	const DOC_NAME       = 1;	/* Searching for a reference name */
+	const DOC_SDESC      = 2;	/* Short description (First line of documentation) */
+	const DOC_LDESC      = 3;	/* Long description (Continues lines of documentation) */
+	const DOC_SEE        = 4;	/* @see    $REF */
+	const DOC_SEEC       = 5;	/* @see    $REF */
+	const DOC_PARAM      = 6;	/* @param  $ARG $DESC */
+	const DOC_PARAMC     = 7;	/* ...$DESC */
+	const DOC_RETURN     = 8;	/* @return $DESC */
+	const DOC_EXAMPLE    = 9;	/* @example $TITLE */
+	const DOC_EXAMPLEC   = 10;	/* $CODE */
+	const DOC_DEPRECATED = 11;	/* @deprecated $DESC */
 
 	let state = DOC_OUT;
 
@@ -161,6 +163,10 @@ Parser.prototype.parse = function()
 						desc: ''
 					},
 					tag_example: [],	/* @example $TITLE NL $CODE */
+					tag_deprecated: {	/* @deprecated $DESC */
+						deprecated: false,
+						desc: ''
+					}
 				};
 				this.tags.push(doc);
 			}
@@ -192,6 +198,9 @@ Parser.prototype.parse = function()
 			} else if (line.startsWith('@example') && isblank(line[8])) {
 				state = DOC_EXAMPLE;
 				line = line.slice(8);
+			} else if (line.startsWith('@deprecated') && isblank(line[11])) {
+				state = DOC_DEPRECATED;
+				line = line.slice(11);
 			} else {
 				throw new Error(line.split(/\s+/).shift() + ': unknown tag');
 			}
@@ -256,6 +265,13 @@ Parser.prototype.parse = function()
 		case DOC_EXAMPLEC:
 			const ex_lines = doc.tag_example[doc.tag_example.length - 1].lines;
 			ex_lines.push(indented_line);
+			break;
+		case DOC_DEPRECATED:
+			doc.tag_deprecated.deprecated = true;
+			if (!doc.tag_deprecated.desc)
+				doc.tag_deprecated.desc = line;
+			else
+				doc.tag_deprecated.desc += ' ' + line;
 			break;
 		}
 	});
