@@ -86,6 +86,10 @@ Builder.prototype.renderIndex = function(outfp, index)
 		outfp.write(`<details open><summary>Details</summary>`);
 		outfp.write(`<table>`);
 		outfp.write(`<tr>`);
+		outfp.write(`<td>File</td>`);
+		outfp.write(`<td width="100%">${fileName}</td>`);
+		outfp.write(`</tr>`);
+		outfp.write(`<tr>`);
 		outfp.write(`<td>Exported</td>`);
 		outfp.write(`<td width="100%">${tag.exported ? "Yes" : "No"}</td>`);
 		outfp.write(`</tr>`);
