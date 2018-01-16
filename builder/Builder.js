@@ -35,6 +35,11 @@ Builder.prototype.writeHead = function(outfp, title)
 	outfp.write(`<!DOCTYPE html><html lang="en"><head>`);
 	outfp.write(`<meta charset="utf-8">`);
 	outfp.write(`<title>${util.escapeHtml(title)}</title>`);
+	outfp.write(`<link rel="stylesheet" href="https://unpkg.com/chota@0.4.2/dist/chota.min.css">`);
+	outfp.write('<style>');
+	outfp.write('pre li,details summary{cursor:pointer}');
+	outfp.write('pre li:target{background:#eeeeee;}');
+	outfp.write('</style>');
 	outfp.write('</head><body>');
 }
 
@@ -52,7 +57,7 @@ Builder.prototype.renderIndicies = function()
 	outfp.write('body{max-width:750px;margin:0 auto;}');
 	outfp.write('section{margin-bottom:60px;}');
 	outfp.write('table{width:100%;}');
-	outfp.write('td{background-color:#eeeeee;padding:5px;vertical-align:top;}');
+	outfp.write('td{border:2px solid white;background-color:#eeeeee;padding:5px;vertical-align:top;}');
 	outfp.write('details{margin-bottom: 15px;}');
 	outfp.write('</style>');
 	this.indicies.forEach(index => {
@@ -127,12 +132,8 @@ Builder.prototype.renderIndex = function(outfp, index)
 			outfp.write(`<details open><summary>Examples</summary>`);
 			tag.tag_example.forEach((example, ix) => {
 				const title = example.title ? util.interpretMarkers(example.title) : `Example #${ix + 1}`;
-				outfp.write(`<h5>${title}</h5>`);
-				outfp.write(`<pre><code>`);
-				example.lines.forEach(line => {
-					outfp.write(`${line}\n`);
-				});
-				outfp.write(`</code></pre>`);
+				outfp.write(`<h4>${title}</h4>`);
+				this.renderCode(outfp, example.lines, `${tag.refname}:${ix}`);
 			});
 			outfp.write(`</details>`);
 		}
@@ -155,10 +156,6 @@ Builder.prototype.renderSourceViews = function()
 		const outfile = path.join(OUT_DIR, path.basename(index.file) + '.html');
 		const outfp = fs.createWriteStream(outfile);
 		this.writeHead(outfp, path.basename(index.file));
-		outfp.write('<style>');
-		outfp.write('a{display:block;text-decoration:none;color:#2a2a2a;}');
-		outfp.write(':target{background:#eeeeee;}');
-		outfp.write('</style>');
 		this.renderSourceView(outfp, index);
 		this.writeFoot(outfp);
 		outfp.close();
@@ -167,18 +164,46 @@ Builder.prototype.renderSourceViews = function()
 
 Builder.prototype.renderSourceView = function(outfp, index)
 {
-	outfp.write('<pre><code><ol>');
-	index.lines.forEach((line, lineno) => {
+	this.renderCode(outfp, index.lines);
+}
+
+Builder.prototype.renderCode = function(outfp, lines, ns)
+{
+	/* ns = optional */
+	const TAB_SIZE = 8;
+
+	/* Mesure length of initial spaces and trim those from each line */
+	let spaces = 0;
+	for (let i = 0; i < lines[0].length; i++) {
+		if (lines[0][i] === ' ')
+			spaces++;
+		else if (lines[0][i] === '\t') {
+			spaces = spaces - (spaces % TAB_SIZE) + TAB_SIZE;
+		}
+		else
+			break;
+	}
+	let trimSpace_r = new RegExp(`^\\s{0,${spaces}}`);
+
+	outfp.write('<pre><ol>');
+	lines.forEach((line, lineno) => {
 		lineno++;
-		outfp.write(`<li id="line:${lineno}">`);
+		line = line.replace(trimSpace_r, '');
 		if (line === '')
 			line = '&nbsp;'
 		else
 			line = util.escapeHtml(line);
-		outfp.write(`<a href="#line:${lineno}">${line}</a>`);
-		outfp.write(`</li>`);
+		outfp.write(`<li onclick="location.hash='${lineref(lineno)}'" id="${lineref(lineno)}"><code>${line}</code>`);
 	});
-	outfp.write('</ol></code></pre>');
+	outfp.write('</ol></pre>');
+
+	function lineref(lineno)
+	{
+		if (ns)
+			return `${ns}:line:${lineno}`;
+		else
+			return `line:${lineno}`;
+	}
 }
 
 module.exports = Builder;
