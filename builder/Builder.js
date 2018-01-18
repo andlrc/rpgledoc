@@ -70,7 +70,7 @@ Builder.prototype.renderIndex = function(outfp, index)
 {
 	const fileName = path.basename(index.file);
 	index.tags.forEach(tag => {
-		outfp.write(`<section id="ref:${tag.refname}">`);
+		outfp.write(`<section id="ref:${tag.exported ? '' : fileName + ':'}${tag.refname}">`);
 		outfp.write(`<header>`);
 		outfp.write(`<h3><a href="${fileName}.html#line:${tag.line}">`);
 		outfp.write(tag.refname);
@@ -113,14 +113,14 @@ Builder.prototype.renderIndex = function(outfp, index)
 			if (tag.tag_return.desc) {
 				outfp.write(`<tr>`);
 				outfp.write(`<td>returns</td>`);
-				outfp.write(`<td>${tag.tag_return.type.replace(/ /g, '&nbsp;')}</td>`);
+				outfp.write(`<td>${tag.tag_return.type}</td>`);
 				outfp.write(`<td width="100%">${util.interpretMarkers(util.escapeHtml(tag.tag_return.desc))}</td>`);
 				outfp.write(`</tr>`);
 			}
 			tag.tag_params.forEach(param => {
 				outfp.write(`<tr>`);
 				outfp.write(`<td><a href="${fileName}.html#line:${param.line}">${param.arg}</a></td>`);
-				outfp.write(`<td>${param.type.replace(/ /g, '&nbsp')}</td>`);
+				outfp.write(`<td>${param.type}</td>`);
 				outfp.write(`<td>${util.interpretMarkers(util.escapeHtml(param.desc))}</td>`);
 				outfp.write(`</tr>`);
 			});
