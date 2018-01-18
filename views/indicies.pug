@@ -1,8 +1,34 @@
 extends layout.pug
 block content
+  nav
+    form
+      h4 Search Query
+      input(type="search" name="query")
+      details(open)
+        summary Files
+        .row
+          each index, ix in indicies
+            .col-3
+              label
+                input(type="checkbox" name="file[]" value=index.filename checked)
+                = index.filename
+      details(open)
+        summary Exported
+        .row
+          .col-3
+            label
+              input(type="checkbox" name="exported[]" value="true" checked)
+              = "Yes"
+          .col-3
+            label
+              input(type="checkbox" name="exported[]" value="false")
+              = "No"
+      button(type="submit") Search
   each index in indicies
     each tag in index.tags
-      section(id="ref:" + (tag.exported ? '' : index.filename + ':') + tag.refname)
+      section(id="ref:" + (tag.exported ? '' : index.filename + ':') + tag.refname,
+              data-file=index.filename,
+              data-exported=String(tag.exported))
         header
           h3
             a(href=index.filename + ".html#line:" + tag.line)
@@ -56,3 +82,5 @@ block content
             ul
               each see in tag.tag_see
                 li!= util.interpretMarkers('{@link ' + see + '}')
+  script
+    include filter.js
