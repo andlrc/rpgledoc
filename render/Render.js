@@ -8,7 +8,7 @@ const pug  = require('pug');
 const OUT_DIR = 'rpgledoc-html';
 const VIEW_DIR = path.join(__dirname, '..', 'views');
 
-function Builder(indicies)
+function Render(indicies)
 {
 	this.indicies = indicies;
 	this.ensureOutputDirectory();
@@ -17,7 +17,7 @@ function Builder(indicies)
 	this.renderSourceViews();
 }
 
-Builder.prototype.ensureOutputDirectory = function()
+Render.prototype.ensureOutputDirectory = function()
 {
 	try {
 		const stat = fs.statSync(OUT_DIR);
@@ -32,28 +32,30 @@ Builder.prototype.ensureOutputDirectory = function()
 	}
 }
 
-Builder.prototype.renderIndicies = function()
+Render.prototype.renderIndicies = function()
 {
 	const outfile = path.join(OUT_DIR, 'index.html');
 	const outfp = fs.createWriteStream(outfile);
 	const html = pug.renderFile(path.join(VIEW_DIR, 'indicies.pug'), Object.assign({
-		util: util
+		util: util,
+		pageTitle: "Index"
 	}, this));
 	outfp.write(html);
 	outfp.close();
 }
 
-Builder.prototype.renderSourceViews = function()
+Render.prototype.renderSourceViews = function()
 {
 	this.indicies.forEach((index) => {
 		const outfile = path.join(OUT_DIR, index.filename + '.html');
 		const outfp = fs.createWriteStream(outfile);
 		const html = pug.renderFile(path.join(VIEW_DIR, 'source.pug'), Object.assign({
-			util: util
+			util: util,
+			pageTitle: index.filename
 		}, index));
 		outfp.write(html);
 		outfp.close();
 	});
 }
 
-module.exports = Builder;
+module.exports = Render;
