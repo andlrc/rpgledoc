@@ -21,7 +21,9 @@ argv.forEach((infile) => {
 	try {
 		const parser = new Parser(infile);
 		console.log('%s: %d tags found', infile, parser.tags.length);
-		indicies.push(parser);
+		/* Only keep the parsed file if any tags was found */
+		if (parser.tags.length)
+			indicies.push(parser);
 	} catch(e) {
 		if (debug)
 			throw e;
