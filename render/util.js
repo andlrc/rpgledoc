@@ -59,7 +59,7 @@ function interpretMarkers(str)
 			if (marker.brackets === 0) {
 				switch (marker.type) {
 				case 'link':
-					out += `<a href="#ref:${marker.value}">${marker.value}</a>`;
+					out += `<a href="index.html#ref:${marker.value}">${marker.value}</a>`;
 					break;
 				case 'code':
 					out += `<code>${marker.value}</code>`;
