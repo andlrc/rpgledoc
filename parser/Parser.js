@@ -169,7 +169,7 @@ Parser.prototype.parse = function()
 					scope.proc = '';
 			}
 
-			if (/^\s*\/\*\*/.test(line)) {
+			if (/^\s*\/\*\*\s*$/.test(line)) {
 				state = DOC_SDESC;
 
 				doc = {
