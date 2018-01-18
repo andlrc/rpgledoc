@@ -42,6 +42,7 @@ block content
                 =")"
           summary
             p!= util.interpretMarkers(util.escapeHtml(tag.short_desc))
+          p!= util.interpretMarkers(tag.long_desc)
         details(open)
           summary Details
           table
