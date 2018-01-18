@@ -77,7 +77,35 @@ function interpretMarkers(str)
 	return out;
 }
 
+/**
+ * Generate unique reference ID
+ * <ul>
+ *   <li>Symbols that are not exported are prefixed with their filename
+ *   <li>Symbols that are not global are prefixed with their procedure / data structure
+ * </ul>
+ * <p>
+ * I.e a field in a global data structure non exported will have the following ref ID: {@code
+ * $FILE_NAME:$DS_NAME:$FIELD_NAME}.
+ * <p>
+ * The pattern can be described like this: {@code [$FILE_NAME:][$PROC_NAME:][$DS_NAME:]$SYMBOL}
+ */
+function ref(tag, index)
+{
+	const ref = ['ref'];
+	if (!tag.exported)
+		ref.push(index.filename);
+	/* Inside procedure */
+	if (tag.scope.proc && tag.scope.refname !== tag.scope.proc)
+		ref.push(tag.scope.proc);
+	/* Inside data structure */
+	if (tag.scope.ds && tag.scope.refname !== tag.scope.ds)
+		ref.push(tag.scope.ds);
+	ref.push(tag.refname);
+	return ref.join(':');
+}
+
 module.exports = {
 	escapeHtml: escapeHtml,
-	interpretMarkers: interpretMarkers
+	interpretMarkers: interpretMarkers,
+	ref: ref
 };

@@ -26,7 +26,7 @@ block content
       button(type="submit") Search
   each index in indicies
     each tag in index.tags
-      section(id="ref:" + (tag.exported ? '' : index.filename + ':') + tag.refname,
+      section(id=util.ref(tag, index),
               data-file=index.filename,
               data-exported=String(tag.exported))
         header
