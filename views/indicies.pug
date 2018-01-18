@@ -5,7 +5,15 @@ block content
       section(id="ref:" + (tag.exported ? '' : index.filename + ':') + tag.refname)
         header
           h3
-            a(href=index.filename + ".html#line:" + tag.line)= tag.refname
+            a(href=index.filename + ".html#line:" + tag.line)
+              =tag.refname
+              if tag.type == "proc"
+                ="("
+                each param, ix in tag.tag_params
+                  if ix > 0
+                    =" : "
+                  =param.arg
+                =")"
           summary
             p!= util.interpretMarkers(util.escapeHtml(tag.short_desc))
         details(open)
