@@ -1,0 +1,31 @@
+mixin code(lines, ns)
+  - const TAB_SIZE = 8
+  - /* Mesure length of initial spaces and trim those from each line */
+  - let spaces = 0;
+  - for (let i = 0; i < lines[0].length; i++) {
+  -   if (lines[0][i] === ' ') {
+  -     spaces++;
+  -   } else if (lines[0][i] === '\t') {
+  -     spaces = spaces - (spaces % TAB_SIZE) + TAB_SIZE;
+  -   } else {
+  -     break;
+  -   }
+  - }
+  - let trimSpace_r = new RegExp(`^\\s{0,${spaces}}`);
+  - function lineref(lineno) {
+  -   const ref = ['line', lineno];
+  -   if (ns) {
+  -     ref.unshift(ns);
+  -   }
+  -   return ref.join(':');
+  - }
+  pre
+    ol
+      each line, ix in lines
+        - const lineno = ix + 1;
+        - line = line.replace(trimSpace_r, '');
+        li(onclick='location.hash="' + lineref(lineno) + '"', id=lineref(lineno))
+          if line
+            code= line
+          else
+            code &nbsp;

@@ -1,0 +1,50 @@
+extends layout.pug
+block content
+  each index in indicies
+    each tag in index.tags
+      section(id="ref:" + (tag.exported ? '' : index.filename + ':') + tag.refname)
+        header
+          h3
+            a(href=index.filename + ".html#line:" + tag.line)= tag.refname
+          summary
+            p!= util.interpretMarkers(util.escapeHtml(tag.short_desc))
+        details(open)
+          summary Details
+          table
+            tr
+              td File
+              td(width="100%")= index.filename
+            tr
+              td Exported
+              td= tag.exported ? "Yes" : "No"
+            if tag.tag_deprecated.deprecated
+              tr
+                td Deprecated
+                td!= util.interpretMarkers(util.escapeHtml(tag.tag_deprecated.desc || "Yes"))
+        if tag.tag_params.length || tag.tag_return.desc
+          details(open)
+            summary= tag.type == "ds" ? "Fields" : "Interface"
+            table
+              if tag.tag_return.desc
+                tr
+                  td returns
+                  td= tag.tag_return.type
+                  td!= util.interpretMarkers(util.escapeHtml(tag.tag_return.desc))
+              each param in tag.tag_params
+                tr
+                  td
+                    a(href=index.filename + ".html#line:" + param.line)= param.arg
+                  td= param.type
+                  td!= util.interpretMarkers(util.escapeHtml(param.desc))
+        if tag.tag_example.length
+          details(open)
+            summary Examples
+            each example, ix in tag.tag_example 
+              h4!= example.title ? util.interpretMarkers(example.title) : 'Example #' + (ix + 1)
+              +code(example.lines, tag.refname + ':' + ix)
+        if tag.tag_see.length
+          details(open)
+            summary See Also
+            ul
+              each see in tag.tag_see
+                li!= util.interpretMarkers('{@link ' + see + '}')

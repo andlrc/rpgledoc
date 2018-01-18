@@ -1,0 +1,34 @@
+include code-render.pug
+doctype html
+html(lang="en")
+  head
+    title Index
+    link(rel="stylesheet", href="https://unpkg.com/chota@0.4.2/dist/chota.min.css")
+    style.
+      body {
+        max-width: 750px;
+        margin: 0 auto;
+      }
+      section {
+        margin-bottom: 60px;
+      }
+      table {
+        width: 100%;
+      }
+      td {
+        border: 2px solid white;
+        background-color: #eeeeee;
+        padding: 5px;
+        vertical-align: top;
+      }
+      details {
+        margin-bottom: 15px;
+      }
+      pre li, details summary {
+        cursor: pointer;
+      }
+      pre li:target {
+        background-color: #eeeeee;
+      }
+  body
+    block content

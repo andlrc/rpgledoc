@@ -1,6 +1,7 @@
 "use strict";
 
 const fs = require('fs');
+const path = require('path');
 
 function isspace(c)
 {
@@ -15,6 +16,7 @@ function isblank(c)
 function Parser(infile)
 {
 	this.file = infile;
+	this.filename = path.basename(infile);
 	this.tags = [];
 	this.lines = [];
 
@@ -26,6 +28,7 @@ Parser.prototype.toJSON = function()
 {
 	return {
 		file: this.file,
+		filename: this.filename,
 		tags: this.tags,
 		lines: this.lines
 	};

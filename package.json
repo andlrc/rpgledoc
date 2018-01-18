@@ -1,6 +1,6 @@
 {
   "name": "rpgledoc",
-  "version": "0.0.19",
+  "version": "0.0.21",
   "description": "",
   "main": "indexfile.js",
   "scripts": {
@@ -17,5 +17,7 @@
   },
   "bin": "bin/rpgledoc",
   "homepage": "https://github.com/andlrc/rpgledoc#readme",
-  "dependencies": {}
+  "dependencies": {
+    "pug": "^2.0.0-rc.4"
+  }
 }
