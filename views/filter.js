@@ -45,7 +45,15 @@ function filter(options)
 		let kws = options.query.toLowerCase().split(/\s+/);
 		sections = sections.filter((section) => {
 			const text = section.innerText.toLowerCase();
-			if (!kws.every(kw => text.includes(kw))) {
+			if (!kws.every(kw => {
+				let propeq;
+				if ((propeq = kw.match(/^(\w+)=(.+)/))) {
+					const prop = section.dataset[propeq[1]];
+					return prop ? prop.toLowerCase().includes(propeq[2]) : false;
+				} else {
+					return text.includes(kw);
+				}
+			})) {
 				section.parentNode.removeChild(section);
 				return false;
 			}
