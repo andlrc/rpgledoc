@@ -247,7 +247,10 @@ Parser.prototype.parse = function()
 				state = DOC_AUTHOR;
 				line = line.slice(7);
 			} else {
-				throw new Error(line.split(/\s+/).shift() + ': unknown tag');
+				console.error('%s: unknown tag \'%s\'',
+					      this.file, line.split(/\s+/).shift());
+				state = DOC_IN;
+				return;		/* Next line */
 			}
 		}
 
