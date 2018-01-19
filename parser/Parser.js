@@ -49,20 +49,29 @@ Parser.prototype.parse = function()
 		pi: '',
 		pr: ''
 	};
- 
-	const DOC_OUT        = 0;	/* Searching for documentation */
-	const DOC_NAME       = 1;	/* Searching for a reference name */
-	const DOC_SDESC      = 2;	/* Short description (First line of documentation) */
-	const DOC_LDESC      = 3;	/* Long description (Continues lines of documentation) */
-	const DOC_SEE        = 4;	/* @see    $REF */
-	const DOC_SEEC       = 5;	/* @see    $REF */
-	const DOC_PARAM      = 6;	/* @param  $ARG $DESC */
-	const DOC_PARAMC     = 7;	/* ...$DESC */
-	const DOC_RETURN     = 8;	/* @return $DESC */
-	const DOC_EXAMPLE    = 9;	/* @example $TITLE */
-	const DOC_EXAMPLEC   = 10;	/* $CODE */
-	const DOC_DEPRECATED = 11;	/* @deprecated $DESC */
-	const DOC_TODO       = 12;	/* @todo $DESC */
+
+	/*
+	 * A documentation follows the following pattern:
+	 * DOC_SDESC \n ( DOC_LDESC \n )* ( DOC_TAG* \n )+
+	 * Everyting but DOC_OUT, DOC_NAME, DOC_SDESC, and DOC_LDESC is
+	 * considered DOC_TAG
+	 */
+	const DOC_OUT		= 0;	/* Searching for documentation */
+	const DOC_NAME		= 1;	/* Searching for a reference name */
+	const DOC_SDESC		= 2;	/* Short description (First line of documentation) */
+	const DOC_LDESC		= 3;	/* Long description (Continues lines of documentation) */
+	const DOC_SEE		= 4;	/* @see    $REF */
+	const DOC_SEEC		= 5;	/* @see    $REF */
+	const DOC_PARAM		= 6;	/* @param  $ARG $DESC */
+	const DOC_PARAMC	= 7;	/* ...$DESC */
+	const DOC_RETURN	= 8;	/* @return $DESC */
+	const DOC_EXAMPLE	= 9;	/* @example $TITLE */
+	const DOC_EXAMPLEC	= 10;	/* $CODE */
+	const DOC_DEPRECATED	= 11;	/* @deprecated $DESC */
+	const DOC_TODO		= 12;	/* @todo $DESC */
+	const DOC_AUTHOR	= 13;	/* @author $DESC */
+
+	const DOC_IN		= 9999;	/* Inside a documentation, buth without a purpose */
 
 	let state = DOC_OUT;
 
@@ -195,7 +204,8 @@ Parser.prototype.parse = function()
 						deprecated: false,
 						desc: ''
 					},
-					tag_todo: ''		/* @todo $DESC */
+					tag_todo: '',		/* @todo $DESC */
+					tag_author: []		/* @author $DESC */
 				};
 				this.tags.push(doc);
 			}
@@ -233,6 +243,9 @@ Parser.prototype.parse = function()
 			} else if (line.startsWith('@todo') && isblank(line[5])) {
 				state = DOC_TODO;
 				line = line.slice(5);
+			} else if (line.startsWith('@author') && isblank(line[7])) {
+				state = DOC_AUTHOR;
+				line = line.slice(7);
 			} else {
 				throw new Error(line.split(/\s+/).shift() + ': unknown tag');
 			}
@@ -311,6 +324,10 @@ Parser.prototype.parse = function()
 			else
 				doc.tag_todo += ' ' + line;
 			break;
+		case DOC_AUTHOR:
+			doc.tag_author.push(line);
+			break;
+			state = DOC_EXAMPLE;
 		}
 	});
 }

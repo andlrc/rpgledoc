@@ -66,6 +66,10 @@ block content
             tr
               td File
               td(width="100%")= index.filename
+            each author in tag.tag_author
+              tr
+                td Author
+                td= author
             tr
               td Exported
               td= tag.exported ? "Yes" : "No"
