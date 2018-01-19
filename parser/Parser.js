@@ -190,7 +190,7 @@ Parser.prototype.parse = function()
 					scope: Object.assign({}, scope),
 					exported: false,
 					type: '',		/* proc, ds, s, c, or '' */
-					refname: '',		/* procedure, structure, ... name */
+					refname: this.filename,	/* procedure, structure, ... name */
 					short_desc: '',		/* one time description */
 					long_desc: '',		/* ...continuesly lines */
 					tag_see: [],		/* @see    $REFNAME */

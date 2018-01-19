@@ -106,7 +106,7 @@ block content
             summary Examples
             each example, ix in tag.tag_example 
               h4!= example.title ? util.interpretMarkers(example.title) : 'Example #' + (ix + 1)
-              +code(example.lines, tag.refname + ':' + ix)
+              +code(example.lines, util.ref(tag, index) + ':' + ix)
         if tag.tag_see.length
           details(open)
             summary See Also
