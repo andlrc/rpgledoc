@@ -54,7 +54,8 @@ block content
               td= tag.exported ? "Yes" : "No"
             if tag.tag_deprecated.deprecated
               tr
-                td Deprecated
+                td
+                  mark Deprecated
                 td!= util.interpretMarkers(util.escapeHtml(tag.tag_deprecated.desc || "Yes"))
             if tag.tag_todo
               tr
