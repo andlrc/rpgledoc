@@ -329,8 +329,8 @@ Parser.prototype.parse = function()
 			break;
 		case DOC_AUTHOR:
 			doc.tag_author.push(line);
+			state = DOC_IN;
 			break;
-			state = DOC_EXAMPLE;
 		}
 	});
 }
