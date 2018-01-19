@@ -62,6 +62,7 @@ Parser.prototype.parse = function()
 	const DOC_EXAMPLE    = 9;	/* @example $TITLE */
 	const DOC_EXAMPLEC   = 10;	/* $CODE */
 	const DOC_DEPRECATED = 11;	/* @deprecated $DESC */
+	const DOC_TODO       = 12;	/* @todo $DESC */
 
 	let state = DOC_OUT;
 
@@ -193,7 +194,8 @@ Parser.prototype.parse = function()
 					tag_deprecated: {	/* @deprecated $DESC */
 						deprecated: false,
 						desc: ''
-					}
+					},
+					tag_todo: ''		/* @todo $DESC */
 				};
 				this.tags.push(doc);
 			}
@@ -228,6 +230,9 @@ Parser.prototype.parse = function()
 			} else if (line.startsWith('@deprecated') && isblank(line[11])) {
 				state = DOC_DEPRECATED;
 				line = line.slice(11);
+			} else if (line.startsWith('@todo') && isblank(line[5])) {
+				state = DOC_TODO;
+				line = line.slice(5);
 			} else {
 				throw new Error(line.split(/\s+/).shift() + ': unknown tag');
 			}
@@ -299,6 +304,12 @@ Parser.prototype.parse = function()
 				doc.tag_deprecated.desc = line;
 			else
 				doc.tag_deprecated.desc += ' ' + line;
+			break;
+		case DOC_TODO:
+			if (!doc.tag_todo)
+				doc.tag_todo = line;
+			else
+				doc.tag_todo += ' ' + line;
 			break;
 		}
 	});

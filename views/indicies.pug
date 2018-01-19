@@ -56,6 +56,11 @@ block content
               tr
                 td Deprecated
                 td!= util.interpretMarkers(util.escapeHtml(tag.tag_deprecated.desc || "Yes"))
+            if tag.tag_todo
+              tr
+                td
+                  mark Todo
+                td!= util.interpretMarkers(util.escapeHtml(tag.tag_todo))
         if tag.tag_params.length || tag.tag_return.desc
           details(open)
             summary= tag.type == "ds" ? "Fields" : "Interface"
