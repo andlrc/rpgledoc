@@ -23,11 +23,28 @@ block content
             label
               input(type="checkbox" name="exported[]" value="false")
               = "No"
+      details(open)
+        summary Sort By
+        .row
+          .col-3
+            label
+              input(type="radio" name="sortBy" value="refname")
+              = "Ref Name"
+          .col-3
+            label
+              input(type="radio" name="sortBy" value="file")
+              = "File Name"
+          .col-3
+            label
+              input(type="radio" name="sortBy" value="type")
+              = "Type"
       button(type="submit") Search
   each index in indicies
     each tag in index.tags
       section(id=util.ref(tag, index),
               data-file=index.filename,
+              data-refname=tag.refname,
+              data-type=tag.type,
               data-exported=String(tag.exported))
         header
           h3
@@ -52,6 +69,9 @@ block content
             tr
               td Exported
               td= tag.exported ? "Yes" : "No"
+            tr
+              td Type
+              td= tag.type
             if tag.tag_deprecated.deprecated
               tr
                 td

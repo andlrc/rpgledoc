@@ -1,5 +1,6 @@
 const filterOptions = {
 	query: '',
+	sortBy: '',
 	files: [],
 	exported: []
 };
@@ -10,6 +11,8 @@ location.search.slice(1).split('&').forEach(fragment => {
 	const [name, value] = [decodeURIComponent(m[1]), decodeURIComponent(m[2]).replace(/\+/g, ' ')];
 	if (name === 'query') {
 		filterOptions.query = value;
+	} else if (name === 'sortBy') {
+		filterOptions.sortBy = value;
 	} else if (name === 'file[]') {
 		filterOptions.files.push(value);
 	} else if (name === 'exported[]') {
@@ -18,6 +21,9 @@ location.search.slice(1).split('&').forEach(fragment => {
 });
 if (filterOptions.query) {
 	document.querySelector('[name=query]').value = filterOptions.query;
+}
+if (filterOptions.sortBy) {
+	document.querySelector('[name=sortBy][value="' + filterOptions.sortBy + '"]').checked = true;
 }
 if (filterOptions.files.length) {
 	[].forEach.call(document.querySelectorAll('[name="file[]"]'), el => {
@@ -64,6 +70,25 @@ function filter(options)
 				return false;
 			}
 			return true;
+		});
+	}
+
+	if (sections.length && options.sortBy) {
+		sections.sort((a, b) => {
+			var aText = a.dataset[options.sortBy];
+			var bText = b.dataset[options.sortBy];
+
+			if (aText > bText)
+				return 1;
+			else if (aText < bText)
+				return -1;
+			else
+				return 0;
+		});
+
+		const parentNode = sections[0].parentNode;
+		sections.forEach(section => {
+			parentNode.appendChild(section);
 		});
 	}
 }
