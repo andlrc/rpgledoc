@@ -4,6 +4,7 @@ const fs = require('fs');
 const util = require('./util.js');
 const path = require('path');
 const pug  = require('pug');
+const pgminfo = require('../package.json');
 
 const OUT_DIR = 'rpgledoc-html';
 const VIEW_DIR = path.join(__dirname, '..', 'views');
@@ -38,6 +39,7 @@ Render.prototype.renderIndicies = function()
 	const outfp = fs.createWriteStream(outfile);
 	const html = pug.renderFile(path.join(VIEW_DIR, 'indicies.pug'), Object.assign({
 		util: util,
+		pgminfo: pgminfo,
 		pageTitle: "Index"
 	}, this));
 	outfp.write(html);
@@ -51,6 +53,7 @@ Render.prototype.renderSourceViews = function()
 		const outfp = fs.createWriteStream(outfile);
 		const html = pug.renderFile(path.join(VIEW_DIR, 'source.pug'), Object.assign({
 			util: util,
+			pgminfo: pgminfo,
 			pageTitle: index.filename
 		}, index));
 		outfp.write(html);
