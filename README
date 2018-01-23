@@ -1,0 +1,59 @@
+RPGLEDOC
+
+Create documentation from JavaDoc compatible comments in ILE RPG programs.
+
+A comment consist of:
+
+	COMMENT [DCL]...
+	[DCL]...
+
+COMMENT		is a JavaDoc comment:
+	'/**' NL
+	COMMENT_LEADER SHORT_DESC
+	( COMMENT_LEADER LONG_DESC )*
+	( COMMENT_LEADER TAG )*
+	'*/' NL
+NL		is a newline character ('\r?\n')
+COMMENT_LEADER	is an optional comment leader
+	( SP* '*' SP* )?
+SHORT_DESC	is always the first line in the comment
+	LINE
+LONG_DESC	is zero or more lines following SHORT_DESC
+	DESC
+TAG		is one of SEE, PARAM, RETURN, EXAMPLE, DEPRECATED, TODO, AUTHOR
+SEE		is a reference to a symbol:
+	'@see' SYMBOL
+PARAM		is a procedure parameter, or member in a data structure
+	'@param' SP IDENT SP DESC
+RETURN		is the return value of a procedure
+	'@param' SP DESC
+EXAMPLE		is multiply lines with example code
+	'@example' SP LINE
+	IDESC
+SP		is a white space character (one of ' ' (0x20), '\t' (0x09))
+LINE		is a line, with comment leader and TAG removed. A LINE can
+		contain a MARKER
+DESC		is zero or more LINE's
+SYMBOL		is a WORD
+IDENT		is a WORD
+WORD		is everything but a white space character
+IDESC		is DESC with indentation preserved
+MARKER		is an inline marker, one of MARKER_LINK, MARKER_CODE
+MARKER_LINK	is an inline SYMBOL reference
+	'{@link' SP SYMBOL '}'
+MARKER_CODE	is inline code
+	'{@code' SP BRA_BLCE '}'
+BRA_BLCE	is balanced curly brackets, for each opening bracket ('{') a
+		closing bracket must be present ('}')
+DCL		is a declaration a comment 
+	( DCL_S | DCL_C | DCL_PR | DCL_PROC | DCL_DS )
+DCL_S		is a standalone declaration
+	'dcl-s' IDENT .* EXPORT*
+DCL_C		is a constant declaration
+	'dcl-c' IDENT .* EXPORT*
+DCL_PR		is a prototype declaration
+	'dcl-pr' IDENT .* EXPORT*
+DCL_PROC	is a procedure declaration
+	'dcl-proc' IDENT .* EXPORT*
+DCL_DS		is a data structure declaration
+	'dcl-ds' IDENT .* EXPORT*
